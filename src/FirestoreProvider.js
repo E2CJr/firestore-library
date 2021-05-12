@@ -8,7 +8,10 @@ class FirestoreProvider {
 
 	constructor(serviceAccount) {
 			
-		this.collection = "process@company";
+		this.collectionUser = "process@user"
+		this.collectionSensor = "process@sensor";
+		this.collectionCompany = "process@company";
+		this.collectionMachine = "process@machine";
 
 		const props = Object.keys(serviceAccount);
 		if (
@@ -28,13 +31,13 @@ class FirestoreProvider {
 	}
 
 	async index() {
-		const snapshot = await this.db.collection(this.collection).get();
+		const snapshot = await this.db.collection(this.collectionCompany).get();
 		return snapshot.docs.map(doc => doc.data());
 	}
 
 	async getCompany(company) {
 		const hasCompany = await this.db
-			.collection(this.collection)
+			.collection(this.collectionCompany)
 			.where("name", "==", company)
 			.get(); 
 
@@ -43,7 +46,7 @@ class FirestoreProvider {
 
 	async getUsersCompany(company) {
 		const hasCompany = await this.db
-			.collection(this.collection)
+			.collection(this.collectionCompany)
 			.where("name", "==", company)
 			.get(); 
 
@@ -51,9 +54,9 @@ class FirestoreProvider {
 			throw new Error("Empresa não encontrada");
 	
 		const users = await this.db
-			.collection(this.collection)
+			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
-			.collection("process@user")
+			.collection(this.collectionUser)
 			.get()
 		
 		return users.docs.map(user => user.data());
@@ -68,7 +71,7 @@ class FirestoreProvider {
 			throw new Error("Empresa já cadastrada");
 
 		const document = this.db
-			.collection(this.collection)
+			.collection(this.collectionCompany)
 			.doc(generateDocName());
 
 		return await document.set({ 
@@ -79,7 +82,7 @@ class FirestoreProvider {
 
 	async findById(id) {
 		const document = await this.db
-			.collection(this.collection)
+			.collection(this.collectionCompany)
 			.where("id", "==", id)
 			.get();
 
@@ -88,7 +91,7 @@ class FirestoreProvider {
 
 	async remove(id) {
 		const document = await this.db
-			.collection(this.collection)
+			.collection(this.collectionCompany)
 			.where("id", "==", id)
 			.get();
 
@@ -100,7 +103,7 @@ class FirestoreProvider {
 
 	async update(id, data) {
 		const document = await this.db
-			.collection(this.collection)
+			.collection(this.collectionCompany)
 			.where("id", "==", id)
 			.get();
 
@@ -120,9 +123,9 @@ class FirestoreProvider {
 			throw new Error("Empresa não cadastrada");
 				
 		const document = this.db
-			.collection(this.collection)
+			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
-			.collection("process@user")
+			.collection(this.collectionUser)
 			.doc(generateDocName());
 
 		return await document.set({ 
