@@ -41,13 +41,31 @@ class FirestoreProvider {
 		return hasCompany;
 	}
 
+	async getUsersCompany(company) {
+		const hasCompany = await this.db
+			.collection(this.collection)
+			.where("name", "==", company)
+			.get(); 
+
+		if (hasCompany.empty)
+			throw new Error("Empresa não encontrada");
+	
+		const users = await this.db
+			.collection(this.collection)
+			.doc(hasCompany.docs[0].ref.path.split('/')[1])
+			.collection("process@user")
+			.get()
+		
+		return users.docs.map(user => user.data());
+	}
+
 	async save(data) {
 		if (!data.name)
-			throw new Error("name is required");
+			throw new Error("Propriedade 'name' é necessária");
 		
 		const hasCompany = await this.getCompany(data.name);
 		if (!hasCompany.empty)
-			throw new Error("Company already exists");
+			throw new Error("Empresa já cadastrada");
 
 		const document = this.db
 			.collection(this.collection)
@@ -92,6 +110,24 @@ class FirestoreProvider {
 		await document.docs[0].ref.update({
 			...data,
 			id: document.docs[0].data().id,
+		});
+	}
+
+	async createUser(company, data) {
+		const hasCompany = await this.getCompany(company);
+		
+		if (hasCompany.empty) 
+			throw new Error("Empresa não cadastrada");
+				
+		const document = this.db
+			.collection(this.collection)
+			.doc(hasCompany.docs[0].ref.path.split('/')[1])
+			.collection("process@user")
+			.doc(generateDocName());
+
+		return await document.set({ 
+			...data,
+			id: uuidv4(),
 		});
 	}
 	
