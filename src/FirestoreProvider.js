@@ -57,7 +57,25 @@ class FirestoreProvider {
 			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
 			.collection(this.collectionUser)
-			.get()
+			.get();
+		
+		return users.docs.map(user => user.data());
+	}
+
+	async getMachinesCompany(company) {
+		const hasCompany = await this.db
+			.collection(this.collectionCompany)
+			.where("name", "==", company)
+			.get(); 
+
+		if (hasCompany.empty)
+			throw new Error("Empresa não encontrada");
+	
+		const users = await this.db
+			.collection(this.collectionCompany)
+			.doc(hasCompany.docs[0].ref.path.split('/')[1])
+			.collection(this.collectionMachine)
+			.get();
 		
 		return users.docs.map(user => user.data());
 	}
@@ -144,6 +162,46 @@ class FirestoreProvider {
 			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
 			.collection(this.collectionUser)
+			.where("id", "==", id)
+			.get();
+
+		if (document.empty) 
+			throw new Error("ID não encontrado");
+
+		await document.docs[0].ref.update({
+			...data,
+			id: document.docs[0].data().id,
+		});
+	}
+
+	async createMachine(company, data) {
+		const hasCompany = await this.getCompany(company);
+		
+		if (hasCompany.empty) 
+			throw new Error("Empresa não cadastrada");
+				
+		const document = this.db
+			.collection(this.collectionCompany)
+			.doc(hasCompany.docs[0].ref.path.split('/')[1])
+			.collection(this.collectionMachine)
+			.doc(generateDocName());
+
+		return await document.set({ 
+			...data,
+			id: uuidv4(),
+		});
+	}
+
+	async updateMachine(company, id, data) {
+		const hasCompany = await this.getCompany(company);
+		
+		if (hasCompany.empty) 
+			throw new Error("Empresa não cadastrada");
+		
+		const document = await this.db
+			.collection(this.collectionCompany)
+			.doc(hasCompany.docs[0].ref.path.split('/')[1])
+			.collection(this.collectionMachine)
 			.where("id", "==", id)
 			.get();
 
