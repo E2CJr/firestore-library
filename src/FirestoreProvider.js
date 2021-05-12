@@ -133,6 +133,28 @@ class FirestoreProvider {
 			id: uuidv4(),
 		});
 	}
+
+	async updateUser(company, id, data) {
+		const hasCompany = await this.getCompany(company);
+		
+		if (hasCompany.empty) 
+			throw new Error("Empresa não cadastrada");
+		
+		const document = await this.db
+			.collection(this.collectionCompany)
+			.doc(hasCompany.docs[0].ref.path.split('/')[1])
+			.collection(this.collectionUser)
+			.where("id", "==", id)
+			.get();
+
+		if (document.empty) 
+			throw new Error("ID não encontrado");
+
+		await document.docs[0].ref.update({
+			...data,
+			id: document.docs[0].data().id,
+		});
+	}
 	
 }
 
