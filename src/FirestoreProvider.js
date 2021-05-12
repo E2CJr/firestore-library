@@ -21,9 +21,11 @@ class FirestoreProvider {
 		) throw new Error("Credenciais mal formatadas");
 
 		try {
-			admin.initializeApp({
-				credential: admin.credential.cert(serviceAccount),
-			});
+			if (!admin.apps.length) {
+				admin.initializeApp({
+					credential: admin.credential.cert(serviceAccount),
+				});
+			}
 			this.db = admin.firestore();
 		} catch (err) {
 			throw new Error(`Problema ao conectar no banco de dados: ${err.message}`);
