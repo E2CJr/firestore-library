@@ -2,6 +2,7 @@ const { v4:uuidv4 } = require("uuid");
 const admin = require("firebase-admin");
 const { randomBytes } = require("crypto");
 
+const generateDocName = () => randomBytes(10).toString("hex");
 
 class FirestoreProvider {
 
@@ -31,10 +32,26 @@ class FirestoreProvider {
 		return snapshot.docs.map(doc => doc.data());
 	}
 
+	async getCompany(company) {
+		const hasCompany = await this.db
+			.collection(this.collection)
+			.where("name", "==", company)
+			.get(); 
+
+		return hasCompany;
+	}
+
 	async save(data) {
+		if (!data.name)
+			throw new Error("name is required");
+		
+		const hasCompany = await this.getCompany(data.name);
+		if (!hasCompany.empty)
+			throw new Error("Company already exists");
+
 		const document = this.db
 			.collection(this.collection)
-			.doc(`${randomBytes(10).toString("hex")}`);
+			.doc(generateDocName());
 
 		return await document.set({ 
 			...data,
