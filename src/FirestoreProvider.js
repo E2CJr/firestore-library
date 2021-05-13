@@ -256,6 +256,128 @@ class FirestoreProvider {
 
 		await document.docs[0].ref.delete();
 	}
+
+	async getSensors(company, machineId) {
+		const hasCompany = await this.getCompany(company);
+		
+		if (hasCompany.empty) 
+			throw new Error("Empresa não cadastrada");
+				
+		const hasMachine = await this.db
+			.collection(this.collectionCompany)
+			.doc(hasCompany.docs[0].ref.path.split('/')[1])
+			.collection(this.collectionMachine)
+			.where("id", "==", machineId)
+			.get();
+
+		if (hasMachine.empty) 
+			throw new Error("Máquina não cadastrada");
+		
+		const sensors = await this.db
+			.collection(this.collectionCompany)
+			.doc(hasCompany.docs[0].ref.path.split('/')[1])
+			.collection(this.collectionMachine)
+			.doc(hasMachine.docs[0].ref.path.split('/')[1])
+			.collection(this.collectionSensor)
+			.get();
+		
+		return sensors.docs.map(sensor => sensor.data());
+	}
+
+	async createSensor(company, machineId, data) {
+		const hasCompany = await this.getCompany(company);
+		
+		if (hasCompany.empty) 
+			throw new Error("Empresa não cadastrada");
+				
+		const hasMachine = await this.db
+			.collection(this.collectionCompany)
+			.doc(hasCompany.docs[0].ref.path.split('/')[1])
+			.collection(this.collectionMachine)
+			.where("id", "==", machineId)
+			.get();
+
+		if (hasMachine.empty) 
+			throw new Error("Máquina não cadastrada");
+		
+		const document = this.db
+			.collection(this.collectionCompany)
+			.doc(hasCompany.docs[0].ref.path.split('/')[1])
+			.collection(this.collectionMachine)
+			.doc(hasMachine.docs[0].ref.path.split('/')[1])
+			.collection(this.collectionSensor)
+			.doc(generateDocName());
+
+		return await document.set({ 
+			...data,
+			id: uuidv4(),
+		});
+	}
+
+	async updateSensor(company, machineId, id, data) {
+		const hasCompany = await this.getCompany(company);
+		
+		if (hasCompany.empty) 
+			throw new Error("Empresa não cadastrada");
+				
+		const hasMachine = await this.db
+			.collection(this.collectionCompany)
+			.doc(hasCompany.docs[0].ref.path.split('/')[1])
+			.collection(this.collectionMachine)
+			.where("id", "==", machineId)
+			.get();
+
+		if (hasMachine.empty) 
+			throw new Error("Máquina não cadastrada");
+		
+		const document = await this.db
+			.collection(this.collectionCompany)
+			.doc(hasCompany.docs[0].ref.path.split('/')[1])
+			.collection(this.collectionMachine)
+			.doc(hasMachine.docs[0].ref.path.split('/')[1])
+			.collection(this.collectionSensor)
+			.where("id", "==", id)
+			.get();
+		
+		if (document.empty)
+			throw new Error("ID não encontrado");
+
+		await document.docs[0].ref.update({
+			...data,
+			id: document.docs[0].data().id,
+		});
+	}
+
+	async deleteSensor(company, machineId, id) {
+		const hasCompany = await this.getCompany(company);
+		
+		if (hasCompany.empty) 
+			throw new Error("Empresa não cadastrada");
+				
+		const hasMachine = await this.db
+			.collection(this.collectionCompany)
+			.doc(hasCompany.docs[0].ref.path.split('/')[1])
+			.collection(this.collectionMachine)
+			.where("id", "==", machineId)
+			.get();
+
+		if (hasMachine.empty) 
+			throw new Error("Máquina não cadastrada");
+		
+		const document = await this.db
+			.collection(this.collectionCompany)
+			.doc(hasCompany.docs[0].ref.path.split('/')[1])
+			.collection(this.collectionMachine)
+			.doc(hasMachine.docs[0].ref.path.split('/')[1])
+			.collection(this.collectionSensor)
+			.where("id", "==", id)
+			.get();
+
+		if (document.empty) 
+			throw new Error("ID não encontrado");
+
+		await document.docs[0].ref.delete();
+	}
 	
 }
 
