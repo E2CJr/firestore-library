@@ -64,7 +64,7 @@ class FirestoreProvider {
 		return users.docs.map(user => user.data());
 	}
 
-	async getMachinesCompany(company) {
+	async getMachinesCompany(company, id=null) {
 		const hasCompany = await this.db
 			.collection(this.collectionCompany)
 			.where("name", "==", company)
@@ -73,13 +73,16 @@ class FirestoreProvider {
 		if (hasCompany.empty)
 			throw new Error("Empresa não encontrada");
 	
-		const users = await this.db
+		const document = this.db
 			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
-			.collection(this.collectionMachine)
-			.get();
+			.collection(this.collectionMachine);
 		
-		return users.docs.map(user => user.data());
+		const machines = id
+			? await document.where("id", "==", id).get()
+			: await document.get(); 
+		
+		return machines.docs.map(user => user.data());
 	}
 
 	async save(data) {
