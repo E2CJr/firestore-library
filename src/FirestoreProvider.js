@@ -83,6 +83,24 @@ class FirestoreProvider {
 		return user.empty? null : user.docs[0].data();
 	}
 
+	async findUserByEmail(email) {
+		const companies = await this.db
+			.collection(this.collectionCompany)
+			.get();
+
+		for (let i=0 ; i<companies.docs.length ; i++) {
+			const user = await this.db
+				.collection(this.collectionCompany)
+				.doc(companies.docs[i].ref.path.split('/')[1])
+				.collection(this.collectionUser)
+				.where("email", "==", email)
+				.get();
+	
+			if(!user.empty) 
+				return user.docs[0].data();
+		}
+	}
+
 	async getMachinesCompany(company, id=null) {
 		const hasCompany = await this.db
 			.collection(this.collectionCompany)
