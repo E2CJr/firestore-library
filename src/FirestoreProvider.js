@@ -314,7 +314,7 @@ class FirestoreProvider {
 			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
 			.collection(this.collectionMachine)
-			.doc(hasMachine.docs[0].ref.path.split('/')[1])
+			.doc(hasMachine.docs[0].ref.path.split('/')[3])
 			.collection(this.collectionSensor)
 			.get();
 		
@@ -341,7 +341,7 @@ class FirestoreProvider {
 			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
 			.collection(this.collectionMachine)
-			.doc(hasMachine.docs[0].ref.path.split('/')[1])
+			.doc(hasMachine.docs[0].ref.path.split('/')[3])
 			.collection(this.collectionSensor)
 			.doc(generateDocName());
 
@@ -371,7 +371,7 @@ class FirestoreProvider {
 			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
 			.collection(this.collectionMachine)
-			.doc(hasMachine.docs[0].ref.path.split('/')[1])
+			.doc(hasMachine.docs[0].ref.path.split('/')[3])
 			.collection(this.collectionSensor)
 			.where("id", "==", id)
 			.get();
@@ -405,7 +405,7 @@ class FirestoreProvider {
 			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
 			.collection(this.collectionMachine)
-			.doc(hasMachine.docs[0].ref.path.split('/')[1])
+			.doc(hasMachine.docs[0].ref.path.split('/')[3])
 			.collection(this.collectionSensor)
 			.where("id", "==", id)
 			.get();
