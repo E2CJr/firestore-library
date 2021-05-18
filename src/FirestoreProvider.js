@@ -351,7 +351,7 @@ class FirestoreProvider {
 		});
 	}
 
-	async updateSensor(company, machineId, id, data) {
+	async getSensor(company, machineId, id) {
 		const hasCompany = await this.getCompany(company);
 		
 		if (hasCompany.empty) 
@@ -376,12 +376,50 @@ class FirestoreProvider {
 			.where("id", "==", id)
 			.get();
 		
-		if (document.empty)
+		return document.empty? null : document.docs[0];
+	}
+
+	async updateSensor(company, machineId, id, data) {
+		const sensor = await this.getSensor(company, machineId, id);
+		
+		if (!sensor)
 			throw new Error("ID não encontrado");
 
-		await document.docs[0].ref.update({
+		await sensor.ref.update({
 			...data,
-			id: document.docs[0].data().id,
+			id: sensor.data().id,
+		});
+	}
+
+	async saveSensorInfos(company, machineId, id, data) {
+		const sensor = await this.getSensor(company, machineId, id);
+
+		if (!sensor)
+			throw new Error("ID não encontrado");
+
+		const date = new Date().toISOString().split('T')[0];
+		const [ano, mes, dia] = date.split('-');
+
+		const sensorData = sensor.data();
+
+		sensorData.infos = {
+			...sensorData.infos,
+			[`${ano}`]: {
+				...sensorData.infos?.[ano],
+				[`${mes}`]: {
+					...sensorData.infos?.[ano]?.[mes],
+					[`${dia}`]: [
+						...sensorData.infos?.[ano]?.[mes]?.[dia]
+							? sensorData.infos?.[ano]?.[mes]?.[dia] 
+							: [],
+						{ ...data }
+					]
+				}
+			}
+		}
+
+		await sensor.ref.update({
+			...sensorData
 		});
 	}
 
