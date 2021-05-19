@@ -216,6 +216,30 @@ class FirestoreProvider {
 		});
 	}
 
+	async updateUserWithoutCompany(id, data) {
+		const companies = await this.db
+			.collection(this.collectionCompany)
+			.get();
+
+		for (let i=0 ; i<companies.docs.length ; i++) {
+			const user = await this.db
+				.collection(this.collectionCompany)
+				.doc(companies.docs[i].ref.path.split('/')[1])
+				.collection(this.collectionUser)
+				.where("id", "==", id)
+				.get();
+	
+			if(!user.empty) {
+				await user.docs[0].ref.update({
+					...data,
+					id: user.docs[0].data().id
+				});
+				return;
+			}
+		}
+		throw new Error("ID não encontrado");
+	}
+
 	async deleteUser(company, id) {
 		const hasCompany = await this.getCompany(company);
 		
