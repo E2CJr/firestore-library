@@ -345,6 +345,34 @@ class FirestoreProvider {
 		return sensors.docs.map(sensor => sensor.data());
 	}
 
+	async getSensorsById(company, machineId, id) {
+		const hasCompany = await this.getCompany(company);
+		
+		if (hasCompany.empty) 
+			throw new Error("Empresa não cadastrada");
+				
+		const hasMachine = await this.db
+			.collection(this.collectionCompany)
+			.doc(hasCompany.docs[0].ref.path.split('/')[1])
+			.collection(this.collectionMachine)
+			.where("id", "==", machineId)
+			.get();
+
+		if (hasMachine.empty) 
+			throw new Error("Máquina não cadastrada");
+		
+		const sensors = await this.db
+			.collection(this.collectionCompany)
+			.doc(hasCompany.docs[0].ref.path.split('/')[1])
+			.collection(this.collectionMachine)
+			.doc(hasMachine.docs[0].ref.path.split('/')[3])
+			.collection(this.collectionSensor)
+			.where("id", "==", id)
+			.get();
+		
+		return sensors.empty? null : sensors.docs[0].data();
+	}
+
 	async createSensor(company, machineId, data) {
 		const hasCompany = await this.getCompany(company);
 		
