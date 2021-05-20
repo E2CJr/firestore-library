@@ -318,7 +318,7 @@ class FirestoreProvider {
 		await document.docs[0].ref.delete();
 	}
 
-	async getSensors(company, machineId) {
+	async getSensors(company, machineId, returnInfos=false) {
 		const hasCompany = await this.getCompany(company);
 		
 		if (hasCompany.empty) 
@@ -342,7 +342,11 @@ class FirestoreProvider {
 			.collection(this.collectionSensor)
 			.get();
 		
-		return sensors.docs.map(sensor => sensor.data());
+		return sensors.docs.map(sensor => {
+			if (returnInfos) return sensor.data();
+			const { infos: _, ...rest } = sensor.data();
+			return rest;
+		});
 	}
 
 	async getSensorsById(company, machineId, id) {
