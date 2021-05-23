@@ -553,6 +553,40 @@ class FirestoreProvider {
 		return hasCompany.docs[0].data().logs;		
 	}
 	
+	async saveEvents(company, machineId, id, event) {
+		const sensor = await this.getSensor(company, machineId, id);
+		
+		if (!sensor)
+			throw new Error("ID não encontrado");
+
+		const now = new Date();
+		now.setHours(now.getHours() - now.getTimezoneOffset() / 60);
+		const [date, hour] = now.toISOString().split('T');
+		const [ano, mes, dia] = date.split('-');
+		
+		const sensorData = sensor.data();
+
+		sensorData.events = {
+			...sensorData.events,
+			[`${ano}`]: {
+				...sensorData.events?.[ano],
+				[`${mes}`]: {
+					...sensorData.events?.[ano]?.[mes],
+					[`${dia}`]: [
+						...sensorData.events?.[ano]?.[mes]?.[dia]
+							? sensorData.events?.[ano]?.[mes]?.[dia] 
+							: [],
+						`${hour.split('.')[0]} - ${event}`
+					]
+				}
+			}
+		}
+
+		await sensor.ref.update({
+			...sensorData
+		});	
+	}
+	
 }
 
 module.exports = FirestoreProvider;
