@@ -295,6 +295,10 @@ class FirestoreProvider {
 
 		await document.docs[0].ref.update({
 			...data,
+			sensorParameters: {
+				...data.sensorParameters,
+				...document.docs[0].data().sensorParameters
+			},
 			id: document.docs[0].data().id,
 		});
 	}
