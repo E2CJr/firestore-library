@@ -557,7 +557,7 @@ class FirestoreProvider {
 		return hasCompany.docs[0].data().logs;		
 	}
 	
-	async saveEvents(company, machineId, id, event) {
+	async saveEvents(company, machineId, id, ...evs) {
 		const sensor = await this.getSensor(company, machineId, id);
 		
 		if (!sensor)
@@ -580,7 +580,7 @@ class FirestoreProvider {
 						...sensorData.events?.[ano]?.[mes]?.[dia]
 							? sensorData.events?.[ano]?.[mes]?.[dia] 
 							: [],
-						`${hour.split('.')[0]} - ${event}`
+						...evs.map(event => `${hour.split('.')[0]} - ${event}`)
 					]
 				}
 			}
