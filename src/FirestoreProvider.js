@@ -322,6 +322,29 @@ class FirestoreProvider {
 		await document.docs[0].ref.delete();
 	}
 
+	async getMachineBySensor(company, sensorId) {
+		const hasCompany = await this.getCompany(company);
+		
+		if (hasCompany.empty) 
+			throw new Error("Empresa não cadastrada");
+		
+		const document = await this.db
+			.collection(this.collectionCompany)
+			.doc(hasCompany.docs[0].ref.path.split('/')[1])
+			.collection(this.collectionMachine)
+			.get();
+
+		for (let i=0 ; i<document.docs.length ; i++) {
+			const machine = document.docs[i].data();
+			const sensors = await this.getSensors(company, machine.id);
+			if (sensors.length === 0) continue;
+
+			for (let j=0 ; j<sensors.length ; j++) 
+				if (sensors[i].id === sensorId) return machine;
+		}
+		return null;
+	}
+
 	async getSensors(company, machineId, returnInfos=false) {
 		const hasCompany = await this.getCompany(company);
 		
