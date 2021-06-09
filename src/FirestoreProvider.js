@@ -97,7 +97,10 @@ class FirestoreProvider {
 				.get();
 	
 			if(!user.empty) 
-				return user.docs[0].data();
+				return {
+					user: user.docs[0].data(),
+					company: companies.docs[i].data().id
+				}
 		}
 	}
 
