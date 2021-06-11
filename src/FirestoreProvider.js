@@ -341,7 +341,7 @@ class FirestoreProvider {
 		return null;
 	}
 
-	async getSensors(company, machineId, returnInfos=false) {
+	async getSensors(company, machineId, returnInfos=false, returnEvents=false) {
 		const hasCompany = await this.getCompany(company);
 		
 		if (hasCompany.empty) 
@@ -366,8 +366,19 @@ class FirestoreProvider {
 			.get();
 		
 		return sensors.docs.map(sensor => {
-			if (returnInfos) return sensor.data();
-			const { infos: _, ...rest } = sensor.data();
+			if (returnInfos && returnEvents) return sensor.data();
+
+			if (returnInfos) {
+				const { events: _, ...rest } = sensor.data();
+				return rest;
+			}
+
+			if (returnEvents) {
+				const { infos: _, ...rest } = sensor.data();
+				return rest;
+			}
+
+			const { infos: _, events: __, ...rest } = sensor.data();
 			return rest;
 		});
 	}
