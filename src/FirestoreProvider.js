@@ -40,7 +40,7 @@ class FirestoreProvider {
 	async getCompany(company) {
 		const hasCompany = await this.db
 			.collection(this.collectionCompany)
-			.where("name", "==", company)
+			.where("id", "==", company)
 			.get(); 
 
 		return hasCompany;
@@ -49,7 +49,7 @@ class FirestoreProvider {
 	async getUsersCompany(company) {
 		const hasCompany = await this.db
 			.collection(this.collectionCompany)
-			.where("name", "==", company)
+			.where("id", "==", company)
 			.get(); 
 
 		if (hasCompany.empty)
@@ -67,7 +67,7 @@ class FirestoreProvider {
 	async getUserByEmail(company, email) {
 		const hasCompany = await this.db
 			.collection(this.collectionCompany)
-			.where("name", "==", company)
+			.where("id", "==", company)
 			.get(); 
 
 		if (hasCompany.empty)
@@ -107,7 +107,7 @@ class FirestoreProvider {
 	async getMachinesCompany(company, id=null) {
 		const hasCompany = await this.db
 			.collection(this.collectionCompany)
-			.where("name", "==", company)
+			.where("id", "==", company)
 			.get(); 
 
 		if (hasCompany.empty)
@@ -126,13 +126,6 @@ class FirestoreProvider {
 	}
 
 	async save(data) {
-		if (!data.name)
-			throw new Error("Propriedade 'name' é necessária");
-		
-		const hasCompany = await this.getCompany(data.name);
-		if (!hasCompany.empty)
-			throw new Error("Empresa já cadastrada");
-
 		const document = this.db
 			.collection(this.collectionCompany)
 			.doc(generateDocName());
