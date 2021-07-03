@@ -383,6 +383,44 @@ class FirestoreProvider {
 		});
 	}
 
+	async getSensorByCompany(company) {
+		const hasCompany = await this.getCompany(company);
+		
+		if (hasCompany.empty) 
+			throw new Error("Empresa não cadastrada");
+		
+		const path_company = hasCompany.docs[0].ref.path.split('/')[1];
+
+		const machines = await this.db
+			.collection(this.collectionCompany)
+			.doc(path_company)
+			.collection(this.collectionMachine)
+			.get();
+
+		if (machines.empty) return [];
+
+		const sensors_company = [];
+
+		const collection = this.db
+			.collection(this.collectionCompany)
+			.doc(path_company)
+			.collection(this.collectionMachine);
+
+		for (let i=0 ; i<machines.docs.length ; i++) {
+			const sensors = await collection
+				.doc(machines.docs[i].ref.path.split('/')[3])
+				.collection(this.collectionSensor)
+				.get();
+			
+			for (let j=0 ; j<sensors.docs.length ; j++) {
+				const { infos: _, events: __, ...rest } = sensors.docs[i].data();
+				sensors_company.push(rest); 
+			}
+		}
+
+		return sensors_company;
+	}
+
 	async getSensorsById(company, machineId, id) {
 		const hasCompany = await this.getCompany(company);
 		
