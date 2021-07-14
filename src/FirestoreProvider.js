@@ -399,23 +399,12 @@ class FirestoreProvider {
 
 		if (machines.empty) return [];
 
-		const sensors_company = [];
-
-		const collection = this.db
-			.collection(this.collectionCompany)
-			.doc(path_company)
-			.collection(this.collectionMachine);
+		const sensors_company = {};
 
 		for (let i=0 ; i<machines.docs.length ; i++) {
-			const sensors = await collection
-				.doc(machines.docs[i].ref.path.split('/')[3])
-				.collection(this.collectionSensor)
-				.get();
-			
-			for (let j=0 ; j<sensors.docs.length ; j++) {
-				const { infos: _, events: __, ...rest } = sensors.docs[i].data();
-				sensors_company.push(rest); 
-			}
+			const machine_id = machines.docs[i].data().id;
+			const sensors = await this.getSensors(company, machine_id);
+			Object.assign(sensors_company, { [`${machine_id}`]: sensors });
 		}
 
 		return sensors_company;
