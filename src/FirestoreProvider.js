@@ -336,7 +336,7 @@ class FirestoreProvider {
 			if (sensors.length === 0) continue;
 
 			for (let j=0 ; j<sensors.length ; j++) 
-				if (sensors[i].id === sensorId) return machine;
+				if (sensors[j].id === sensorId) return machine;
 		}
 		return null;
 	}
