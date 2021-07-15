@@ -341,7 +341,7 @@ class FirestoreProvider {
 		return null;
 	}
 
-	async getSensors(company, machineId, returnInfos=false, returnEvents=false) {
+	async getSensors(company, machineId, id="NO_SENSOR_ID", returnInfos=false, returnEvents=false) {
 		const hasCompany = await this.getCompany(company);
 		
 		if (hasCompany.empty) 
@@ -357,13 +357,16 @@ class FirestoreProvider {
 		if (hasMachine.empty) 
 			throw new Error("Máquina não cadastrada");
 		
-		const sensors = await this.db
+		const sensors_collection = this.db
 			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
 			.collection(this.collectionMachine)
 			.doc(hasMachine.docs[0].ref.path.split('/')[3])
 			.collection(this.collectionSensor)
-			.get();
+			
+		const sensors = id === "NO_SENSOR_ID"
+			? await sensors_collection.get()
+			: await sensors_collection.where("id", "==", id).get();
 		
 		return sensors.docs.map(sensor => {
 			if (returnInfos && returnEvents) return sensor.data();
@@ -408,34 +411,6 @@ class FirestoreProvider {
 		}
 
 		return sensors_company;
-	}
-
-	async getSensorsById(company, machineId, id) {
-		const hasCompany = await this.getCompany(company);
-		
-		if (hasCompany.empty) 
-			throw new Error("Empresa não cadastrada");
-				
-		const hasMachine = await this.db
-			.collection(this.collectionCompany)
-			.doc(hasCompany.docs[0].ref.path.split('/')[1])
-			.collection(this.collectionMachine)
-			.where("id", "==", machineId)
-			.get();
-
-		if (hasMachine.empty) 
-			throw new Error("Máquina não cadastrada");
-		
-		const sensors = await this.db
-			.collection(this.collectionCompany)
-			.doc(hasCompany.docs[0].ref.path.split('/')[1])
-			.collection(this.collectionMachine)
-			.doc(hasMachine.docs[0].ref.path.split('/')[3])
-			.collection(this.collectionSensor)
-			.where("id", "==", id)
-			.get();
-		
-		return sensors.empty? null : sensors.docs[0].data();
 	}
 
 	async createSensor(company, machineId, data) {
