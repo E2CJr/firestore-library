@@ -483,7 +483,7 @@ class FirestoreProvider {
 		});
 	}
 
-	async saveSensorInfos(company, machineId, id, data) {
+	async saveSensorInfos(type, company, machineId, id, data) {
 		const sensor = await this.getSensor(company, machineId, id);
 
 		if (!sensor)
@@ -494,15 +494,15 @@ class FirestoreProvider {
 
 		const sensorData = sensor.data();
 
-		sensorData.infos = {
-			...sensorData.infos,
+		sensorData[`${type}`] = {
+			...sensorData[`${type}`],
 			[`${ano}`]: {
-				...sensorData.infos?.[ano],
+				...sensorData[`${type}`]?.[ano],
 				[`${mes}`]: {
-					...sensorData.infos?.[ano]?.[mes],
+					...sensorData[`${type}`]?.[ano]?.[mes],
 					[`${dia}`]: [
-						...sensorData.infos?.[ano]?.[mes]?.[dia]
-							? sensorData.infos?.[ano]?.[mes]?.[dia] 
+						...sensorData[`${type}`]?.[ano]?.[mes]?.[dia]
+							? sensorData[`${type}`]?.[ano]?.[mes]?.[dia] 
 							: [],
 						{ ...data }
 					]
