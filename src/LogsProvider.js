@@ -1,3 +1,4 @@
+const SensorProvider = require("./SensorProvider");
 const CompanyProvider = require("./CompanyProvider.js");
 
 
@@ -5,6 +6,7 @@ class MachineProvider extends CompanyProvider {
 
   constructor(serviceAccount) {
 		super(serviceAccount);
+		this.sensorProvider = new SensorProvider(serviceAccount);
   }
 
   async index(company) {
@@ -47,6 +49,40 @@ class MachineProvider extends CompanyProvider {
 
 		await hasCompany.docs[0].ref.update({
 			...companyData
+		});	
+	}
+
+	async saveEvents(company, id, ...evs) {
+		const sensor = await this.sensorProvider.getById(company, id, true);
+		
+		if (sensor.empty)
+			throw new Error("ID não encontrado");
+
+		const now = new Date();
+		now.setHours(now.getHours() - now.getTimezoneOffset() / 60);
+		const [date, hour] = now.toISOString().split('T');
+		const [ano, mes, dia] = date.split('-');
+		
+		const sensorData = sensor.docs[0].data();
+
+		sensorData.events = {
+			...sensorData.events,
+			[`${ano}`]: {
+				...sensorData.events?.[ano],
+				[`${mes}`]: {
+					...sensorData.events?.[ano]?.[mes],
+					[`${dia}`]: [
+						...sensorData.events?.[ano]?.[mes]?.[dia]
+							? sensorData.events?.[ano]?.[mes]?.[dia] 
+							: [],
+						...evs.map(event => `${hour.split('.')[0]} - ${event}`)
+					]
+				}
+			}
+		}
+
+		await sensor.docs[0].ref.update({
+			...sensorData
 		});	
 	}
 
