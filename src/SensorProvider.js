@@ -135,6 +135,35 @@ class SensorProvider extends FirestoreProvider {
 		});
 	}
 
+	async getInfos(company, id) {
+		const sensor = await this.getById(company, id, true);
+		
+		if (sensor.empty) 
+			throw new Error("ID não encontrado");
+
+		const document = await sensor.docs[0].ref
+			.collection(this.collectionSensorInfos)
+			.get();
+
+		return document.empty? [] : document.docs.map(doc => doc.data());
+	}
+
+	async saveInfos(company, id, data) {
+		const sensor = await this.getById(company, id, true);
+		
+		if (sensor.empty) 
+			throw new Error("ID não encontrado");
+
+		const document = sensor.docs[0].ref
+			.collection(this.collectionSensorInfos)
+			.doc(generateDocName());
+
+		return await document.set({ 
+			...data,
+			id: new Date().getTime(),
+		});
+	}
+
 }
 
 module.exports = SensorProvider;
