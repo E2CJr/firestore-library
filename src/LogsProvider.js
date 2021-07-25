@@ -2,7 +2,7 @@ const SensorProvider = require("./SensorProvider");
 const CompanyProvider = require("./CompanyProvider.js");
 
 
-class MachineProvider extends CompanyProvider {
+class LogsProvider extends CompanyProvider {
 
   constructor(serviceAccount) {
 		super(serviceAccount);
@@ -88,4 +88,4 @@ class MachineProvider extends CompanyProvider {
 
 }
 
-module.exports = MachineProvider;
+module.exports = LogsProvider;

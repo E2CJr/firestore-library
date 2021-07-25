@@ -1,11 +1,11 @@
 const { v4:uuidv4 } = require("uuid");
 const CompanyProvider = require("./CompanyProvider.js");
 const MachineProvider = require("./MachineProvider");
-const FirestoreProvider = require("./FirestoreProvider");
+const FirestoreConnection = require("./connection/FirestoreConnection");
 const { generateDocName } = require("./common/commons");
 
 
-class SensorProvider extends FirestoreProvider {
+class SensorProvider extends FirestoreConnection {
   
   constructor(serviceAccount) {
 		super(serviceAccount);
