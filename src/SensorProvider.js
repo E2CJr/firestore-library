@@ -25,7 +25,10 @@ class SensorProvider extends FirestoreProvider {
 			.collection(this.collectionSensor)
       .get();
 				
-		return sensors.docs.map(sensor => sensor.data());
+		return sensors.docs.map(sensor => {
+			const { configs:_, events:__, ...rest } = sensor.data();
+			return rest;
+		});
 	}
 
   async getById(company, id, ref=false) {
@@ -42,8 +45,11 @@ class SensorProvider extends FirestoreProvider {
       .get();
 
 		if (ref) return sensor;
+
+		if (sensor.empty) return null;
 				
-		return sensor.empty ? null : sensor.docs[0].data();
+		const { configs:_, events:__, ...rest } = sensor.docs[0].data();
+		return rest;
   }
 
   async save(company, machineId, data) {
@@ -100,6 +106,33 @@ class SensorProvider extends FirestoreProvider {
 			throw new Error("ID não encontrado");
 
 		await document.docs[0].ref.delete();
+	}
+
+	// infos e config
+
+	async getConfig(company, id) {
+		const sensor = await this.getById(company, id, true);
+		
+		if (sensor.empty) 
+			throw new Error("ID não encontrado");
+
+		return sensor.docs[0].data().configs;
+	}
+
+	async saveConfig(company, id, data) {		
+		const sensor = await this.getById(company, id, true);
+		
+		if (sensor.empty) 
+			throw new Error("ID não encontrado");
+		
+		const sensorData = sensor.docs[0].data();
+
+		await sensor.docs[0].ref.update({
+			configs: [
+				...sensorData.configs ? sensorData.configs : [],
+				{ [`${new Date().getTime()}`]: data }
+			]
+		});
 	}
 
 }
