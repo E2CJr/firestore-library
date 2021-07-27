@@ -135,14 +135,30 @@ class SensorProvider extends FirestoreConnection {
 		});
 	}
 
-	async getInfos(company, id) {
+	async getInfos(company, id, start, end) {
 		const sensor = await this.getById(company, id, true);
 		
 		if (sensor.empty) 
 			throw new Error("ID não encontrado");
-
+			
+		if (!end) {
+			const now = new Date();
+			now.setHours(now.getHours() - now.getTimezoneOffset() / 60);
+			end = now.getTime();
+		}
+		
+		if (!start) {
+			const now = new Date();
+			now.setHours(0,0,0,0)
+			now.setHours(now.getHours() - now.getTimezoneOffset() / 60);
+			start = now.getTime();
+		}
+		
 		const document = await sensor.docs[0].ref
 			.collection(this.collectionSensorInfos)
+			.orderBy("id")
+			.startAt(start)
+			.endAt(end)
 			.get();
 
 		return document.empty? [] : document.docs.map(doc => doc.data());
