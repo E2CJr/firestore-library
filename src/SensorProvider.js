@@ -173,10 +173,13 @@ class SensorProvider extends FirestoreConnection {
 		const document = sensor.docs[0].ref
 			.collection(this.collectionSensorInfos)
 			.doc(generateDocName());
-
+		
+		const now = new Date();
+		now.setHours(now.getHours() - now.getTimezoneOffset() / 60);
+		
 		return await document.set({ 
 			...data,
-			id: new Date().getTime(),
+			id: now.getTime(),
 		});
 	}
 
