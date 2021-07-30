@@ -1,6 +1,7 @@
 
 
 module.exports = {
+  ClpProvider: require("./src/ClpProvider"),
   LogsProvider: require("./src/LogsProvider"),
   UserProvider: require("./src/UserProvider"),
   SensorProvider: require("./src/SensorProvider"),

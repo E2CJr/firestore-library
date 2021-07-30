@@ -4,6 +4,7 @@ class FirestoreConnection {
 
   constructor(serviceAccount) {
 			
+		this.collectionClp = "process@clp";
 		this.collectionUser = "process@user"
 		this.collectionSensor = "process@sensor";
 		this.collectionCompany = "process@company";
