@@ -70,10 +70,6 @@ class MachineProvider extends FirestoreConnection {
 
 		await machine.docs[0].ref.update({
 			...data,
-			sensorParameters: {
-				...data.sensorParameters,
-				...machine.docs[0].data().sensorParameters
-			},
 			id: machine.docs[0].data().id,
 		});
 	}
