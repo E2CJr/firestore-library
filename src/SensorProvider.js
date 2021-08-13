@@ -156,12 +156,26 @@ class SensorProvider extends FirestoreConnection {
 		
 		const document = await sensor.docs[0].ref
 			.collection(this.collectionSensorInfos)
-			.orderBy("id")
+			.orderBy("timestamp")
 			.startAt(start)
 			.endAt(end)
+			.select('timestamp', 'sensorId', 'timeSignal', 'rpm', 'temperature', 'rmsVibrationMms')
 			.get();
-
-		return document.empty? [] : document.docs.map(doc => doc.data());
+			
+		if (document.empty) return [];
+			
+		const last = await sensor.docs[0].ref
+			.collection(this.collectionSensorInfos)
+			.orderBy("timestamp", "desc")
+			.startAt(end)
+			.limit(1)
+			.select('timestamp', 'sensorId', 'vibrationFd', 'vibrationFbin')
+			.get();
+		
+		return {
+			list: document.docs.map(doc => doc.data()),
+			last: last.empty? [] : last.docs[0].data()
+		};
 	}
 
 	async saveInfos(company, id, data) {
@@ -177,9 +191,10 @@ class SensorProvider extends FirestoreConnection {
 		const now = new Date();
 		now.setHours(now.getHours() - now.getTimezoneOffset() / 60);
 		
+		const { timestamp: _, ...rest } = data;
 		return await document.set({ 
-			...data,
-			id: now.getTime(),
+			...rest,
+			timestamp: Number(data.timestamp) || now.getTime(),
 		});
 	}
 
