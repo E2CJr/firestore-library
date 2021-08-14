@@ -178,6 +178,23 @@ class SensorProvider extends FirestoreConnection {
 		};
 	}
 
+	async getRmsVibration(company, id, start, end) {
+		const sensor = await this.getById(company, id, true);
+		
+		if (sensor.empty) 
+			throw new Error("ID não encontrado");
+						
+		const document = await sensor.docs[0].ref
+			.collection(this.collectionSensorInfos)
+			.orderBy("timestamp")
+			.startAt(start)
+			.endAt(end)
+			.select("rmsVibrationMms")
+			.get();
+			
+		return document.empty? [] : document.docs.map(doc => doc.data());
+	}
+
 	async saveInfos(company, id, data) {
 		const sensor = await this.getById(company, id, true);
 		
