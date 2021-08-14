@@ -83,6 +83,7 @@ class ClpProvider extends FirestoreConnection {
 		await document.docs[0].ref.update({
 			...data,
 			id: document.docs[0].data().id,
+			machines: document.docs[0].data().machines,
 		});
 	}
 
