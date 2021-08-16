@@ -192,7 +192,10 @@ class SensorProvider extends FirestoreConnection {
 			.select("rmsVibrationMms")
 			.get();
 			
-		return document.empty? [] : document.docs.map(doc => doc.data());
+		return document.empty? [] : document.docs.map(doc => {
+			const { x, y, z } = doc.data().rmsVibrationMms;
+			return { x, y, z };
+		});
 	}
 
 	async saveInfos(company, id, data) {
