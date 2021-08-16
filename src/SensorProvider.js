@@ -159,7 +159,7 @@ class SensorProvider extends FirestoreConnection {
 			.orderBy("timestamp")
 			.startAt(start)
 			.endAt(end)
-			.select('timestamp', 'sensorId', 'timeSignal', 'rpm', 'temperature', 'rmsVibrationMms')
+			.select('timestamp', 'sensorId', 'rpm', 'temperature', 'rmsVibrationMms')
 			.get();
 			
 		if (document.empty) return [];
@@ -169,7 +169,7 @@ class SensorProvider extends FirestoreConnection {
 			.orderBy("timestamp", "desc")
 			.startAt(end)
 			.limit(1)
-			.select('timestamp', 'sensorId', 'vibrationFd', 'vibrationFbin')
+			.select('timestamp', 'sensorId', 'vibrationFd', 'vibrationFbin', 'timeSignal')
 			.get();
 		
 		return {
