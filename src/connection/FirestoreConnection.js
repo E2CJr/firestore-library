@@ -9,6 +9,7 @@ class FirestoreConnection {
 		this.collectionSensor = "process@sensor";
 		this.collectionCompany = "process@company";
 		this.collectionMachine = "process@machine";
+		this.collectionClpInfos = "process@clp_infos";
 		this.collectionSensorInfos = "process@sensor_infos";
 
 		const props = Object.keys(serviceAccount);
