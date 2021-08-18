@@ -1,7 +1,7 @@
 const { v4:uuidv4 } = require("uuid");
 const CompanyProvider = require("./CompanyProvider.js");
 const FirestoreConnection = require("./connection/FirestoreConnection");
-const { generateDocName } = require("./common/commons");
+const { generateDocName, getEndDate, getStartDate } = require("./common/commons");
 
 
 class ClpProvider extends FirestoreConnection {
@@ -131,18 +131,8 @@ class ClpProvider extends FirestoreConnection {
 		if (clp.empty) 
 			throw new Error("ID não encontrado");
 			
-		if (!end) {
-			const now = new Date();
-			now.setHours(now.getHours() - now.getTimezoneOffset() / 60);
-			end = now.getTime();
-		}
-		
-		if (!start) {
-			const now = new Date();
-			now.setHours(0,0,0,0)
-			now.setHours(now.getHours() - now.getTimezoneOffset() / 60);
-			start = now.getTime();
-		}
+		if (!end) end = getEndDate();
+		if (!start) start = getStartDate();
 		
 		const document = await clp.docs[0].ref
 			.collection(this.collectionClpInfos)
