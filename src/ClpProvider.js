@@ -136,9 +136,8 @@ class ClpProvider extends FirestoreConnection {
 		
 		const document = await clp.docs[0].ref
 			.collection(this.collectionClpInfos)
-			.orderBy("timestamp")
-			.startAt(start)
-			.endAt(end)
+			.orderBy("timestamp", "desc")
+			.limit(1)
 			.get();
 		
 		return document.empty? [] : document.docs.map(doc => doc.data());
