@@ -1,5 +1,5 @@
 const CompanyProvider = require("./CompanyProvider.js");
-
+const { generateDocName } = require("./common/commons");
 
 class LogsProvider extends CompanyProvider {
 
