@@ -125,14 +125,11 @@ class ClpProvider extends FirestoreConnection {
 		});
 	}
 
-	async getInfos(company, id, start, end) {
+	async getInfos(company, id) {
 		const clp = await this.getById(company, id, true);
 		
 		if (clp.empty) 
 			throw new Error("ID não encontrado");
-			
-		if (!end) end = getEndDate();
-		if (!start) start = getStartDate();
 		
 		const document = await clp.docs[0].ref
 			.collection(this.collectionClpInfos)
