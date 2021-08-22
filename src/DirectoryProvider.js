@@ -88,6 +88,33 @@ class DirectoryProvider extends FirestoreConnection {
 			id: await this.generateDirectoryIndex(hasCompany.docs[0].ref),
 		});
 	}
+
+	async addEntities(company, folder, data) {
+		const document = await this.getById(company, folder, true);
+		
+		if (document.empty) 
+			throw new Error("Pasta não encontrada");
+
+		const folderData = document.docs[0].data();
+
+		await document.docs[0].ref.update({
+			content: {
+				clps: [
+					...folderData.content?.clps,
+					...data.clps
+				],
+				sensors: [
+					...folderData.content?.sensors,
+					...data.sensors
+				],
+				machines: [
+					...folderData.content?.machines,
+					...data.machines
+				],
+			},
+			id: folderData.id,
+		});
+	}
 }
 
 module.exports = DirectoryProvider;
