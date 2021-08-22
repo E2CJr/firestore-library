@@ -12,5 +12,11 @@ module.exports = {
     now.setHours(0,0,0,0)
     now.setHours(now.getHours() - now.getTimezoneOffset() / 60);
     return now.getTime();
-  }
+  },
+  getPath: (string) => string
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .split(" ")
+    .join("_"),
 }
