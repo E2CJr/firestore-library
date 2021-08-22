@@ -89,6 +89,40 @@ class DirectoryProvider extends FirestoreConnection {
 		});
 	}
 
+	async updateFolder(company, folder, label) {
+		const hasFolder = await this.getById(company, folder, true);
+		
+		if (hasFolder.empty) 
+			throw new Error("Pasta não encontrada");
+		
+		const oldPath = hasFolder.docs[0].data().path;
+		const newPath = oldPath.replace(getPath(oldPath), getPath(label));
+
+		await hasFolder.docs[0].ref.update({
+			label,
+			path: newPath
+		});
+	}
+
+	async deleteFolder(company, folder) {
+		const hasCompany = await this.companyProvider.getById(company, true);
+		
+		if (hasCompany.empty) 
+			throw new Error("Empresa não cadastrada");
+						
+		const document = await this.db
+			.collection(this.collectionCompany)
+			.doc(hasCompany.docs[0].ref.path.split('/')[1])
+			.collection(this.collectionDirectory)
+			.where("id", "==", folder)
+			.get();
+
+		if (document.empty) 
+			throw new Error("ID não encontrado");
+
+		await document.docs[0].ref.delete();
+	}
+
 	async addEntities(company, folder, data) {
 		const document = await this.getById(company, folder, true);
 		
