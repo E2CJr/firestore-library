@@ -56,8 +56,8 @@ class DirectoryProvider extends FirestoreConnection {
 		await this.startDirectoryCounter(hasCompany.docs[0].ref);
 
 		await document.set({
-			path: '/',
-			label: 'Fábrica',
+			path: "/",
+			label: "Fábrica",
 			id: await this.generateDirectoryIndex(hasCompany.docs[0].ref),
 		});
   }
@@ -72,8 +72,8 @@ class DirectoryProvider extends FirestoreConnection {
 			.collection(this.collectionDirectory)
 			.doc(generateDocName());
 
-		const hasParent = await this.getById(company, parent);
-		if (!hasParent) 
+		const hasParent = await this.getById(company, parent, true);
+		if (hasParent.empty) 
 			throw new Error("Diretório pai não encontrado");
 
 		await document.set({
@@ -84,7 +84,7 @@ class DirectoryProvider extends FirestoreConnection {
 				sensors: [],
 				machines: [],
 			},
-			path: `${hasParent.path}${getPath(label)}/`,
+			path: `${hasParent.docs[0].data().path}${getPath(label)}/`,
 			id: await this.generateDirectoryIndex(hasCompany.docs[0].ref),
 		});
 	}
