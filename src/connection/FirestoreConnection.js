@@ -1,4 +1,5 @@
 const admin = require("firebase-admin");
+const { generateDocName } = require("../common/commons");
 
 class FirestoreConnection {
 
@@ -13,6 +14,7 @@ class FirestoreConnection {
 		this.collectionDirectory = "process@directory";
 		this.collectionCompanyLogs = "process@company_logs";
 		this.collectionSensorInfos = "process@sensor_infos";
+		this.collectionDirectoryCounter = "process@directory_counter";
 
 		const props = Object.keys(serviceAccount);
 		if (
@@ -32,6 +34,31 @@ class FirestoreConnection {
 			throw new Error(`Problema ao conectar no banco de dados: ${err.message}`);
 		}
 	}
+
+	async startDirectoryCounter(ref) {
+		const document = ref
+			.collection(this.collectionDirectoryCounter)
+			.doc(generateDocName());
+		
+		await document.set({
+			lastIndex: -1
+		});
+	}
+
+	async generateDirectoryIndex(ref) {
+		const document = await ref
+			.collection(this.collectionDirectoryCounter)
+			.select("lastIndex")
+			.get();
+
+		const index = (document.docs[0].data()).lastIndex;
+
+		await document.docs[0].ref.update({
+			lastIndex: index + 1
+		});
+
+		return index + 1;
+	} 
   
 }
 
