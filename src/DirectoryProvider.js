@@ -42,7 +42,52 @@ class DirectoryProvider extends FirestoreConnection {
 				
 		return folder.empty ? null : folder.docs[0].data();
   }
-  
+		
+  async initTree(company) {
+		const hasCompany = await this.companyProvider.getById(company, true);
+		
+		if (hasCompany.empty) 
+			throw new Error("Empresa não encontrada");
+
+		const document = hasCompany.docs[0].ref
+			.collection(this.collectionDirectory)
+			.doc(generateDocName());
+
+		await this.startDirectoryCounter(hasCompany.docs[0].ref);
+
+		await document.set({
+			path: '/',
+			label: 'Fábrica',
+			id: await this.generateDirectoryIndex(hasCompany.docs[0].ref),
+		});
+  }
+
+	async createFolder(company, parent, label) {
+		const hasCompany = await this.companyProvider.getById(company, true);
+		
+		if (hasCompany.empty) 
+			throw new Error("Empresa não encontrada");
+	
+		const document = hasCompany.docs[0].ref
+			.collection(this.collectionDirectory)
+			.doc(generateDocName());
+
+		const hasParent = await this.getById(company, parent);
+		if (!hasParent) 
+			throw new Error("Diretório pai não encontrado");
+
+		await document.set({
+			label,
+			parent,
+			content: {
+				clps: [],
+				sensors: [],
+				machines: [],
+			},
+			path: `${hasParent.path}${getPath(label)}/`,
+			id: await this.generateDirectoryIndex(hasCompany.docs[0].ref),
+		});
+	}
 }
 
 module.exports = DirectoryProvider;
