@@ -11,10 +11,7 @@ class CompanyProvider extends FirestoreConnection {
 
   async index(ref=false) {
 		const document = await this.db.collection(this.collectionCompany).get();
-		return ref? document : document.docs.map(doc => {
-			const { logs:_, ...rest } = doc.data();
-			return rest;
-		});
+		return ref? document : document.docs.map(doc => doc.data());
 	}
 
   async getById(company, ref=false) {
@@ -30,8 +27,7 @@ class CompanyProvider extends FirestoreConnection {
 
 		if (hasCompany.empty) return null;
 
-    const { logs:_, ...rest } = hasCompany.docs[0].data();
-		return rest;
+    return hasCompany.docs[0].data();
 	}
 
   async save(data) {
@@ -39,10 +35,13 @@ class CompanyProvider extends FirestoreConnection {
 			.collection(this.collectionCompany)
 			.doc(generateDocName());
 
-		return await document.set({ 
+		const id = uuidv4();
+		await document.set({ 
 			...data,
-			id: uuidv4(),
+			id,
 		});
+
+		return id;
 	}
 
   async delete(id) {
