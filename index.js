@@ -7,4 +7,5 @@ module.exports = {
   SensorProvider: require("./src/SensorProvider"),
   CompanyProvider: require("./src/CompanyProvider"),
   MachineProvider: require("./src/MachineProvider"),
+  DirectoryProvider: require("./src/DirectoryProvider"),
 }
