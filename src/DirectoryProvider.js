@@ -78,7 +78,7 @@ class DirectoryProvider extends FirestoreConnection {
 		if (hasParent.empty) 
 			throw new Error("Diretório pai não encontrado");
 
-		await document.set({
+		const data = {
 			label,
 			parent,
 			content: {
@@ -89,7 +89,10 @@ class DirectoryProvider extends FirestoreConnection {
 			level: hasParent.docs[0].data().level + 1,
 			path: `${hasParent.docs[0].data().path}${getPath(label)}/`,
 			id: await this.generateDirectoryIndex(hasCompany.docs[0].ref),
-		});
+		};
+
+		await document.set(data);
+		return data;
 	}
 
 	async updateFolder(company, folder, label) {
@@ -98,13 +101,19 @@ class DirectoryProvider extends FirestoreConnection {
 		if (hasFolder.empty) 
 			throw new Error("Pasta não encontrada");
 		
-		const oldPath = hasFolder.docs[0].data().path;
-		const newPath = oldPath.replace(getPath(oldPath), getPath(label));
+		const data = hasFolder.docs[0].data();
+		const newPath = data.path.replace(getPath(data.label), getPath(label));
 
 		await hasFolder.docs[0].ref.update({
 			label,
 			path: newPath
 		});
+
+		return {
+			...data,
+			label,
+			path: newPath,
+		}
 	}
 
 	async deleteFolder(company, folder) {
