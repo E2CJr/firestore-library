@@ -10,7 +10,7 @@ class DirectoryProvider extends FirestoreConnection {
     this.companyProvider = new CompanyProvider(serviceAccount);
   }
   
-  async index(company) {
+  async index(company, level) {
 		const hasCompany = await this.companyProvider.getById(company, true);
 
 		if (hasCompany.empty)
@@ -20,6 +20,7 @@ class DirectoryProvider extends FirestoreConnection {
 			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
 			.collection(this.collectionDirectory)
+			.where("level", "in", [level, level+1])
       .get();
 				
 		return directories.docs.map(doc => doc.data());
@@ -57,6 +58,7 @@ class DirectoryProvider extends FirestoreConnection {
 
 		await document.set({
 			path: "/",
+			level: 0,
 			label: "Fábrica",
 			id: await this.generateDirectoryIndex(hasCompany.docs[0].ref),
 		});
@@ -84,6 +86,7 @@ class DirectoryProvider extends FirestoreConnection {
 				sensors: [],
 				machines: [],
 			},
+			level: hasParent.docs[0].data().level + 1,
 			path: `${hasParent.docs[0].data().path}${getPath(label)}/`,
 			id: await this.generateDirectoryIndex(hasCompany.docs[0].ref),
 		});
