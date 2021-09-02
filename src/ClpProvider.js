@@ -58,10 +58,13 @@ class ClpProvider extends FirestoreConnection {
 			.collection(this.collectionClp)
 			.doc(generateDocName());
 
-		return await document.set({ 
+		const save = {
 			...data,
 			id: uuidv4(),
-		});
+		};
+		
+		await document.set(save);
+		return save;
 	}
 
   async update(company, id, data) {

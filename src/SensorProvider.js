@@ -69,11 +69,14 @@ class SensorProvider extends FirestoreConnection {
 			.collection(this.collectionSensor)
 			.doc(generateDocName());
 
-		return await document.set({ 
+		const save = {
 			...data,
-      machineId,
+			machineId,
 			id: uuidv4(),
-		});
+		};
+
+		await document.set(save);
+		return save;
 	}
 
   async update(company, id, data) {
