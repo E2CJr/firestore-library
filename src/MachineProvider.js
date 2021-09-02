@@ -44,7 +44,7 @@ class MachineProvider extends FirestoreConnection {
 		return machine.empty ? null : machine.docs[0].data();
   }
 
-	async inArray(company, list) {
+	async machinesInArray(company, list) {
     const hasCompany = await this.companyProvider.getById(company, true);
 
 		if (hasCompany.empty)
@@ -56,6 +56,22 @@ class MachineProvider extends FirestoreConnection {
 			.collection(this.collectionMachine)
       .where("id", "in", list)
 			.where("clpId", "==", null)
+      .get();
+				
+		return machines.empty? [] : machines.docs.map(doc => doc.data().id); 
+  }
+
+	async inArray(company, list) {
+    const hasCompany = await this.companyProvider.getById(company, true);
+
+		if (hasCompany.empty)
+			throw new Error("Empresa não encontrada");
+	
+		const machines = await this.db
+			.collection(this.collectionCompany)
+			.doc(hasCompany.docs[0].ref.path.split('/')[1])
+			.collection(this.collectionMachine)
+      .where("id", "in", list)
       .get();
 				
 		return machines.empty? [] : machines.docs.map(doc => doc.data().id); 
