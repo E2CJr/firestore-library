@@ -128,11 +128,8 @@ class SensorProvider extends FirestoreConnection {
 
 		await sensor.docs[0].ref.update({
 			configs: {
-				sensorNickname: data.sensorNickname || sensorData.sensorNickname,
-				positionOnMachine: data.positionOnMachine || sensorData.positionOnMachine,
-				motor: data.motor || sensorData.motor,
-				geographicPosition: data.geographicPosition || sensorData.geographicPosition,
-				networks: data.networks || sensorData.networks,
+				...sensorData.configs,
+				...data,
 			}
 		});
 	}
