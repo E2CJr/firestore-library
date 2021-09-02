@@ -25,10 +25,7 @@ class SensorProvider extends FirestoreConnection {
 			.collection(this.collectionSensor)
       .get();
 				
-		return sensors.docs.map(sensor => {
-			const { configs:_, events:__, ...rest } = sensor.data();
-			return rest;
-		});
+		return sensors.docs.map(sensor => sensor.data());
 	}
 
   async getById(company, id, ref=false) {
@@ -48,8 +45,7 @@ class SensorProvider extends FirestoreConnection {
 
 		if (sensor.empty) return null;
 				
-		const { configs:_, events:__, ...rest } = sensor.docs[0].data();
-		return rest;
+		return sensor.docs[0].data();
   }
 
   async save(company, machineId, data) {
@@ -131,10 +127,13 @@ class SensorProvider extends FirestoreConnection {
 		const sensorData = sensor.docs[0].data();
 
 		await sensor.docs[0].ref.update({
-			configs: [
-				...sensorData.configs ? sensorData.configs : [],
-				{ [`${new Date().getTime()}`]: data }
-			]
+			configs: {
+				sensorNickname: data.sensorNickname || sensorData.sensorNickname,
+				positionOnMachine: data.positionOnMachine || sensorData.positionOnMachine,
+				motor: data.motor || sensorData.motor,
+				geographicPosition: data.geographicPosition || sensorData.geographicPosition,
+				networks: data.networks || sensorData.networks,
+			}
 		});
 	}
 
