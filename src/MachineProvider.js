@@ -44,7 +44,7 @@ class MachineProvider extends FirestoreConnection {
 		return machine.empty ? null : machine.docs[0].data();
   }
 
-	async machinesInArray(company, list) {
+	async inArray(company, list) {
     const hasCompany = await this.companyProvider.getById(company, true);
 
 		if (hasCompany.empty)

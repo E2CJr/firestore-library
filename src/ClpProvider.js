@@ -109,6 +109,22 @@ class ClpProvider extends FirestoreConnection {
 		await document.docs[0].ref.delete();
 	}
 
+	async inArray(company, list) {
+    const hasCompany = await this.companyProvider.getById(company, true);
+
+		if (hasCompany.empty)
+			throw new Error("Empresa não encontrada");
+	
+		const clps = await this.db
+			.collection(this.collectionCompany)
+			.doc(hasCompany.docs[0].ref.path.split('/')[1])
+			.collection(this.collectionClp)
+      .where("id", "in", list)
+      .get();
+				
+		return clps.empty? [] : clps.docs.map(doc => doc.data().id); 
+  }
+
 	async saveInfos(company, id, data) {
 		const clp = await this.getById(company, id, true);
 		
