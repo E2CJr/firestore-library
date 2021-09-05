@@ -11,7 +11,7 @@ class MachineProvider extends FirestoreConnection {
 		this.companyProvider = new CompanyProvider(serviceAccount);
   }
 
-  async index(company) {
+  async index(company, pagination = { limit: 10, page: 0 }) {
 		const hasCompany = await this.companyProvider.getById(company, true);
 
 		if (hasCompany.empty)
@@ -21,6 +21,9 @@ class MachineProvider extends FirestoreConnection {
 			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
 			.collection(this.collectionMachine)
+			.orderBy("createdAt", "desc")
+			.offset(pagination.limit * pagination.page)
+			.limit(pagination.limit)
       .get();
 				
 		return machines.docs.map(machine => machine.data());

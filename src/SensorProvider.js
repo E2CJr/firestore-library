@@ -13,7 +13,7 @@ class SensorProvider extends FirestoreConnection {
     this.machineProvider = new MachineProvider(serviceAccount);
   }
 
-  async index(company) {
+  async index(company, pagination = { limit: 10, page: 0 }) {
 		const hasCompany = await this.companyProvider.getById(company, true);
 
 		if (hasCompany.empty)
@@ -23,6 +23,9 @@ class SensorProvider extends FirestoreConnection {
 			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
 			.collection(this.collectionSensor)
+			.orderBy("createdAt", "desc")
+			.offset(pagination.limit * pagination.page)
+			.limit(pagination.limit)
       .get();
 				
 		return sensors.docs.map(sensor => sensor.data());
