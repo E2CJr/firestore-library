@@ -60,14 +60,14 @@ class MachineProvider extends FirestoreConnection {
 		if (hasCompany.empty)
 			throw new Error("Empresa não encontrada");
 	
-		const machine = await this.db
+		const machines = await this.db
 			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
 			.collection(this.collectionMachine)
       .where("idClp", "==", idClp)
       .get();
 				
-		return machine.empty ? null : machine.docs[0].data();
+		return machines.empty ? null : machines.docs.map(doc => doc.data());
 	}
 
 	async machinesInArray(company, list) {

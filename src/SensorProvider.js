@@ -64,16 +64,14 @@ class SensorProvider extends FirestoreConnection {
 		if (hasCompany.empty)
 			throw new Error("Empresa não encontrada");
 	
-		const sensor = await this.db
+		const sensors = await this.db
 			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
 			.collection(this.collectionSensor)
       .where("machineId", "==", machineId)
       .get();
 
-		if (sensor.empty) return null;
-				
-		return sensor.docs[0].data();
+			return sensors.empty ? null : sensors.docs.map(doc => doc.data());
   }
 
   async save(company, machineId, data) {
