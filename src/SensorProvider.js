@@ -58,7 +58,7 @@ class SensorProvider extends FirestoreConnection {
 		return sensor.docs[0].data();
   }
 
-	async getByMachine(company, machineId) {
+	async getByMachineList(company, list) {
     const hasCompany = await this.companyProvider.getById(company, true);
 
 		if (hasCompany.empty)
@@ -68,7 +68,7 @@ class SensorProvider extends FirestoreConnection {
 			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
 			.collection(this.collectionSensor)
-      .where("machineId", "==", machineId)
+      .where("machineId", "in", list)
       .get();
 
 			return sensors.empty ? null : sensors.docs.map(doc => doc.data());
