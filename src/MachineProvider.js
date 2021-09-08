@@ -54,7 +54,7 @@ class MachineProvider extends FirestoreConnection {
 		return machine.empty ? null : machine.docs[0].data();
   }
 
-	async getByClp(company, clpId) {
+	async getByClp(company, idClp) {
 		const hasCompany = await this.companyProvider.getById(company, true);
 
 		if (hasCompany.empty)
@@ -64,7 +64,7 @@ class MachineProvider extends FirestoreConnection {
 			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
 			.collection(this.collectionMachine)
-      .where("clpId", "==", clpId)
+      .where("idClp", "==", idClp)
       .get();
 				
 		return machine.empty ? null : machine.docs[0].data();
