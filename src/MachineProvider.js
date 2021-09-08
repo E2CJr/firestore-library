@@ -81,10 +81,12 @@ class MachineProvider extends FirestoreConnection {
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
 			.collection(this.collectionMachine)
       .where("id", "in", list)
-			.where("clpId", "==", null)
       .get();
 				
-		return machines.empty? [] : machines.docs.map(doc => doc.data().id); 
+		return machines.empty? [] : machines.docs.map(doc => {
+			const data = doc.data();
+			if (!data.clpId) return data.id;
+		}); 
   }
 
 	async inArray(company, list) {
