@@ -54,6 +54,22 @@ class MachineProvider extends FirestoreConnection {
 		return machine.empty ? null : machine.docs[0].data();
   }
 
+	async getByClp(company, clpId) {
+		const hasCompany = await this.companyProvider.getById(company, true);
+
+		if (hasCompany.empty)
+			throw new Error("Empresa não encontrada");
+	
+		const machine = await this.db
+			.collection(this.collectionCompany)
+			.doc(hasCompany.docs[0].ref.path.split('/')[1])
+			.collection(this.collectionMachine)
+      .where("clpId", "==", clpId)
+      .get();
+				
+		return machine.empty ? null : machine.docs[0].data();
+	}
+
 	async machinesInArray(company, list) {
     const hasCompany = await this.companyProvider.getById(company, true);
 

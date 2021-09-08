@@ -58,6 +58,24 @@ class SensorProvider extends FirestoreConnection {
 		return sensor.docs[0].data();
   }
 
+	async getByMachine(company, machineId) {
+    const hasCompany = await this.companyProvider.getById(company, true);
+
+		if (hasCompany.empty)
+			throw new Error("Empresa não encontrada");
+	
+		const sensor = await this.db
+			.collection(this.collectionCompany)
+			.doc(hasCompany.docs[0].ref.path.split('/')[1])
+			.collection(this.collectionSensor)
+      .where("machineId", "==", machineId)
+      .get();
+
+		if (sensor.empty) return null;
+				
+		return sensor.docs[0].data();
+  }
+
   async save(company, machineId, data) {
 		const hasCompany = await this.companyProvider.getById(company, true);
 		
