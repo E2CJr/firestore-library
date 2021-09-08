@@ -17,16 +17,23 @@ class ClpProvider extends FirestoreConnection {
 		if (hasCompany.empty)
 			throw new Error("Empresa não encontrada");
 	
-		const clps = await this.db
+		const doc = await this.db
 			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
 			.collection(this.collectionClp)
-			.orderBy("createdAt", "desc")
+			.orderBy("createdAt", "desc");
+
+		const clps = await doc
 			.offset(pagination.limit * pagination.page)
 			.limit(pagination.limit)
 			.get();
 		
-		return clps.docs.map(clp => clp.data());
+		const count = (await doc.get()).size;
+
+		return {
+			count,
+			list: clps.docs.map(clp => clp.data()),
+		};
 	}
 
   async getById(company, id, ref=false) {

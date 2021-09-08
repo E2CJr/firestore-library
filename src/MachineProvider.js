@@ -17,16 +17,23 @@ class MachineProvider extends FirestoreConnection {
 		if (hasCompany.empty)
 			throw new Error("Empresa não encontrada");
 	
-		const machines = await this.db
+		const doc = this.db
 			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
 			.collection(this.collectionMachine)
-			.orderBy("createdAt", "desc")
+			.orderBy("createdAt", "desc");
+		
+		const machines = await doc
 			.offset(pagination.limit * pagination.page)
 			.limit(pagination.limit)
-      .get();
-				
-		return machines.docs.map(machine => machine.data());
+			.get();
+
+		const count = (await doc.get()).size;
+
+		return {
+			count,
+			list: machines.docs.map(machine => machine.data()),
+		};
 	}
 
   async getById(company, id, ref=false) {

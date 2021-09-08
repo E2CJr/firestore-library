@@ -19,16 +19,23 @@ class SensorProvider extends FirestoreConnection {
 		if (hasCompany.empty)
 			throw new Error("Empresa não encontrada");
 	
-		const sensors = await this.db
+		const doc = await this.db
 			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
 			.collection(this.collectionSensor)
-			.orderBy("createdAt", "desc")
+			.orderBy("createdAt", "desc");
+		
+		const sensors = await doc
 			.offset(pagination.limit * pagination.page)
 			.limit(pagination.limit)
       .get();
-				
-		return sensors.docs.map(sensor => sensor.data());
+			
+		const count = (await doc.get()).size;
+			
+		return {
+			count,
+			list: sensors.docs.map(sensor => sensor.data()),
+		};
 	}
 
   async getById(company, id, ref=false) {

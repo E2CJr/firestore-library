@@ -17,16 +17,23 @@ class UserProvider extends FirestoreConnection {
 		if (hasCompany.empty)
 			throw new Error("Empresa não encontrada");
 	
-		const users = await this.db
+		const doc = await this.db
 			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
 			.collection(this.collectionUser)
-			.orderBy("createdAt", "desc")
+			.orderBy("createdAt", "desc");
+
+		const users = await doc
 			.offset(pagination.limit * pagination.page)
 			.limit(pagination.limit)
 			.get();
 		
-		return users.docs.map(user => user.data());
+		const count = (await doc.get()).size;
+
+		return {
+			count,
+			list: users.docs.map(user => user.data()),
+		};
 	}
 
   async save(company, data) {
