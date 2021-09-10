@@ -8,4 +8,5 @@ module.exports = {
   CompanyProvider: require("./src/CompanyProvider"),
   MachineProvider: require("./src/MachineProvider"),
   DirectoryProvider: require("./src/DirectoryProvider"),
+  InternalErrorsProvider: require("./src/InternalErrorsProvider"),
 }

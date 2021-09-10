@@ -14,6 +14,7 @@ class FirestoreConnection {
 		this.collectionDirectory = "process@directory";
 		this.collectionCompanyLogs = "process@company_logs";
 		this.collectionSensorInfos = "process@sensor_infos";
+		this.collectionInternalErrors = "process@internalerrors";
 		this.collectionDirectoryCounter = "process@directory_counter";
 
 		const props = Object.keys(serviceAccount);
