@@ -20,7 +20,7 @@ class DirectoryProvider extends FirestoreConnection {
 			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
 			.collection(this.collectionDirectory)
-			.where("level", "in", [level, level+1])
+			.where("level", "in", [level, level+1, level+2])
       .get();
 				
 		return directories.docs.map(doc => doc.data());
