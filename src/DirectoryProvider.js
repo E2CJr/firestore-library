@@ -10,20 +10,34 @@ class DirectoryProvider extends FirestoreConnection {
     this.companyProvider = new CompanyProvider(serviceAccount);
   }
   
-  async index(company, level) {
+  async index(company, level, folder) {
 		const hasCompany = await this.companyProvider.getById(company, true);
 
 		if (hasCompany.empty)
 			throw new Error("Empresa não encontrada");
-	
-		const directories = await this.db
+		
+		const document = this.db
 			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
-			.collection(this.collectionDirectory)
-			.where("level", "in", [level, level+1, level+2])
+			.collection(this.collectionDirectory);
+	
+		const directories = await document
+			.where("level", "in", [level, level+1])
+      .get();
+
+		if (directories.empty) return null;
+
+		const directoriesData = directories.docs.map(doc => doc.data());
+		const directoryFolder = directoriesData.filter(item => item.id === folder);
+
+		const parent = await document
+			.where("id", "==", directoryFolder[0].parent)
       .get();
 				
-		return directories.docs.map(doc => doc.data());
+		return {
+			parent: parent.empty ? {} : parent.docs[0].data(),
+			list: directoriesData,
+		}
 	}
 
 	async getById(company, id, ref=false) {
