@@ -235,6 +235,10 @@ class SensorProvider extends FirestoreConnection {
 		if (sensor.empty) 
 			throw new Error("ID não encontrado");
 
+		await sensor.docs[0].ref.update({
+			lastMessage: new Date().getTime(),
+		});
+
 		const document = sensor.docs[0].ref
 			.collection(this.collectionSensorInfos)
 			.doc(generateDocName());
