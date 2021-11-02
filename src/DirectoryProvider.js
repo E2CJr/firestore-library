@@ -28,10 +28,10 @@ class DirectoryProvider extends FirestoreConnection {
 		if (directories.empty) return null;
 
 		const directoriesData = directories.docs.map(doc => doc.data());
-		const directoryFolder = directoriesData.filter(item => item.id === folder);
+		const [ directoryFolder ] = directoriesData.filter(item => item.id === folder);
 
 		const parent = await document
-			.where("id", "==", directoryFolder[0].parent)
+			.where("id", "==", directoryFolder?.parent || '')
       .get();
 				
 		return {
