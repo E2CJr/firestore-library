@@ -176,6 +176,21 @@ class SensorProvider extends FirestoreConnection {
 		});
 	}
 
+	async getInfosByTimestamp(company, id, timestamp) {
+		const sensor = await this.getById(company, id, true);
+		
+		if (sensor.empty) 
+			throw new Error("ID não encontrado");
+					
+		const document = await sensor.docs[0].ref
+			.collection(this.collectionSensorInfos)
+			.where("timestamp", "==", timestamp)
+			.select("vibrationFd", "timeSignal")
+			.get();
+			
+		return document.empty? {} : document.docs[0].data()
+	}
+
 	async getInfos(company, id, start, end) {
 		const sensor = await this.getById(company, id, true);
 		
