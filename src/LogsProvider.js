@@ -1,3 +1,4 @@
+const { v4:uuidv4 } = require("uuid");
 const CompanyProvider = require("./CompanyProvider.js");
 const { generateDocName } = require("./common/commons");
 
@@ -18,9 +19,10 @@ class LogsProvider extends CompanyProvider {
 			.doc(generateDocName());
 				
 		return await document.set({ 
-			id,
+			sensorId: id,
 			machine,
-			...data
+			...data,
+			id: uuidv4(),
 		});
 	}
 
