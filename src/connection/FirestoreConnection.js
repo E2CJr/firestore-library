@@ -1,5 +1,4 @@
 const admin = require("firebase-admin");
-const { generateDocName } = require("../common/commons");
 
 class FirestoreConnection {
 
@@ -15,7 +14,6 @@ class FirestoreConnection {
 		this.collectionCompanyLogs = "process@company_logs";
 		this.collectionSensorInfos = "process@sensor_infos";
 		this.collectionInternalErrors = "process@internalerrors";
-		this.collectionDirectoryCounter = "process@directory_counter";
 
 		const props = Object.keys(serviceAccount);
 		if (
@@ -36,31 +34,6 @@ class FirestoreConnection {
 		}
 	}
 
-	async startDirectoryCounter(ref) {
-		const document = ref
-			.collection(this.collectionDirectoryCounter)
-			.doc(generateDocName());
-		
-		await document.set({
-			lastIndex: -1
-		});
-	}
-
-	async generateDirectoryIndex(ref) {
-		const document = await ref
-			.collection(this.collectionDirectoryCounter)
-			.select("lastIndex")
-			.get();
-
-		const index = (document.docs[0].data()).lastIndex;
-
-		await document.docs[0].ref.update({
-			lastIndex: index + 1
-		});
-
-		return index + 1;
-	} 
-  
 }
 
 module.exports = FirestoreConnection;

@@ -35,13 +35,13 @@ class CompanyProvider extends FirestoreConnection {
 			.collection(this.collectionCompany)
 			.doc(generateDocName());
 
-		const id = uuidv4();
-		await document.set({ 
+		const save = {
 			...data,
-			id,
-		});
-
-		return id;
+			id: uuidv4(),
+		};
+		
+		await document.set(save);
+		return save;
 	}
 
   async delete(id) {
