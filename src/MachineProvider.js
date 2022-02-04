@@ -89,7 +89,7 @@ class MachineProvider extends FirestoreConnection {
 		}); 
   }
 
-	async inArray(company, list) {
+	async inArray(company, list, operation = "in", selectOnlyId = true) {
     const hasCompany = await this.companyProvider.getById(company, true);
 
 		if (hasCompany.empty)
@@ -99,10 +99,16 @@ class MachineProvider extends FirestoreConnection {
 			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
 			.collection(this.collectionMachine)
-      .where("id", "in", list)
+      .where("id", operation, list)
       .get();
 				
-		return machines.empty? [] : machines.docs.map(doc => doc.data().id); 
+		return machines.empty? [] : selectOnlyId? machines.docs.map(doc => doc.data().id) : machines.docs.map(doc => {
+			const data = doc.data();
+			return {
+				id: data.id,
+				name: data.name
+			}
+		}); 
   }
 
   async save(company, data) {

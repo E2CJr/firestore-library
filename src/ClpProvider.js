@@ -118,7 +118,7 @@ class ClpProvider extends FirestoreConnection {
 		await document.docs[0].ref.delete();
 	}
 
-	async inArray(company, list) {
+	async inArray(company, list, operation = "in", selectOnlyId = true) {
     const hasCompany = await this.companyProvider.getById(company, true);
 
 		if (hasCompany.empty)
@@ -128,10 +128,16 @@ class ClpProvider extends FirestoreConnection {
 			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
 			.collection(this.collectionClp)
-      .where("id", "in", list)
+      .where("id", operation, list)
       .get();
 				
-		return clps.empty? [] : clps.docs.map(doc => doc.data().id); 
+		return clps.empty? [] : selectOnlyId? clps.docs.map(doc => doc.data().id) : clps.docs.map(doc => {
+			const data = doc.data();
+			return {
+				id: data.id,
+				name: data.name
+			}
+		}); 
   }
 
 	async saveInfos(company, id, data) {

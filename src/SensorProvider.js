@@ -133,7 +133,7 @@ class SensorProvider extends FirestoreConnection {
 		await document.docs[0].ref.delete();
 	}
 
-	async inArray(company, list) {
+	async inArray(company, list, operation = "in", selectOnlyId = true) {
     const hasCompany = await this.companyProvider.getById(company, true);
 
 		if (hasCompany.empty)
@@ -143,10 +143,16 @@ class SensorProvider extends FirestoreConnection {
 			.collection(this.collectionCompany)
 			.doc(hasCompany.docs[0].ref.path.split('/')[1])
 			.collection(this.collectionSensor)
-      .where("id", "in", list)
+      .where("id", operation, list)
       .get();
 				
-		return sensors.empty? [] : sensors.docs.map(doc => doc.data().id); 
+		return sensors.empty? [] : selectOnlyId? sensors.docs.map(doc => doc.data().id) : sensors.docs.map(doc => {
+			const data = doc.data();
+			return {
+				id: data.id,
+				name: data.name
+			}
+		}); 
   }
 
 	// infos e config
