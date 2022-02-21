@@ -154,7 +154,7 @@ class ClpProvider extends FirestoreConnection {
 		now.setHours(now.getHours() - now.getTimezoneOffset() / 60);
 		
 		return await document.set({ 
-			...data,
+			data,
 			timestamp: now.getTime(),
 		});
 	}
